@@ -2,6 +2,10 @@ import { ProductRail } from "@/components/Sections";
 import { products } from "@/data/products";
 
 export default function DealsPage() {
+  const saleProducts = products.filter((product) => product.oldPrice);
+  const supplementalProducts = products.filter((product) => !saleProducts.some((saleProduct) => saleProduct.id === product.id)).slice(0, 2);
+  const dealProducts = [...saleProducts, ...supplementalProducts];
+
   return (
     <>
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -11,7 +15,7 @@ export default function DealsPage() {
           <p className="mt-5 max-w-2xl text-white/70 dark:text-neutral-600">Flash sale styles, best seller markdowns, and premium essentials available for a limited time.</p>
         </div>
       </section>
-      <ProductRail title="Sale edit" items={products.filter((product) => product.oldPrice).concat(products.slice(0, 2))} />
+      <ProductRail title="Sale edit" items={dealProducts} />
     </>
   );
 }

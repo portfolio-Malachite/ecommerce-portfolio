@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Product } from "@/data/products";
 
 export type CartItem = {
@@ -16,11 +16,13 @@ type CartContextValue = {
   items: CartItem[];
   wishlist: string[];
   toast: Toast | null;
+  isReady: boolean;
   addItem: (product: Product, options?: Partial<CartItem>) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   toggleWishlist: (id: string) => void;
   clearCart: () => void;
+  notify: (message: string) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -29,33 +31,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("velora-cart");
     const savedWishlist = localStorage.getItem("velora-wishlist");
     if (savedCart) setItems(JSON.parse(savedCart));
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    setIsReady(true);
   }, []);
 
   useEffect(() => {
+    if (!isReady) return;
     localStorage.setItem("velora-cart", JSON.stringify(items));
-  }, [items]);
+  }, [isReady, items]);
 
   useEffect(() => {
+    if (!isReady) return;
     localStorage.setItem("velora-wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+  }, [isReady, wishlist]);
 
-  function notify(message: string) {
+  const notify = useCallback((message: string) => {
     const next = { id: Date.now(), message };
     setToast(next);
     window.setTimeout(() => setToast((current) => (current?.id === next.id ? null : current)), 2400);
-  }
+  }, []);
 
   const value = useMemo<CartContextValue>(
     () => ({
       items,
       wishlist,
       toast,
+      isReady,
+      notify,
       addItem(product, options) {
         setItems((current) => {
           const existing = current.find((item) => item.product.id === product.id);
@@ -93,7 +101,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setItems([]);
       }
     }),
-    [items, wishlist, toast]
+    [isReady, items, notify, wishlist, toast]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

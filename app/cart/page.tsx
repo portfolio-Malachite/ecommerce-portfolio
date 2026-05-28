@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, LockKeyhole, Minus, Plus, ShieldCheck, ShoppingCart, Sparkles, Star, Trash2, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { products, type Product } from "@/data/products";
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/utils";
@@ -149,13 +149,20 @@ function EmptyCartState({ cartIds }: { cartIds: Set<string> }) {
 }
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, toggleWishlist, wishlist } = useCart();
+  const { items, notify, removeItem, updateQuantity, toggleWishlist, wishlist } = useCart();
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const shipping = subtotal > 150 || subtotal === 0 ? 0 : 12;
   const tax = Math.round(subtotal * 0.08);
   const total = subtotal + shipping + tax;
   const cartIds = useMemo(() => new Set(items.map((item) => item.product.id)), [items]);
+
+  useEffect(() => {
+    const message = sessionStorage.getItem("velora-cart-message");
+    if (!message) return;
+    sessionStorage.removeItem("velora-cart-message");
+    notify(message);
+  }, [notify]);
 
   if (!items.length) {
     return <EmptyCartState cartIds={cartIds} />;
