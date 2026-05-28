@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+.vercel/
+.env
+.env*.local
+*.tsbuildinfo
+
+# Accidental empty clone inside the real project root.
+ecommerce-portfolio/
