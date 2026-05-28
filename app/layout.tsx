@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/AppProviders";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { FloatingChat } from "@/components/FloatingChat";
-
-const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased">
         <AppProviders>
           <Navbar />
           <main className="min-h-screen pt-20">{children}</main>

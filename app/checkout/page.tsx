@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { CreditCard, MapPinned, PackageCheck, Smartphone, Truck, WalletCards } from "lucide-react";
+import { useMemo, useState } from "react";
 import { LinkButton } from "@/components/Button";
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/utils";
@@ -15,23 +16,25 @@ const paymentMethods = [
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
+  const [paymentMethod, setPaymentMethod] = useState("Card");
+  const [cardNumber, setCardNumber] = useState("");
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const shipping = subtotal > 150 ? 0 : 12;
   const tax = Math.round(subtotal * 0.08);
   const total = subtotal + shipping + tax;
+  const cardBrand = useMemo(() => {
+    const digits = cardNumber.replace(/\D/g, "");
+    if (/^4/.test(digits)) return "Visa";
+    if (/^(5[1-5]|2[2-7])/.test(digits)) return "Mastercard";
+    if (/^3[47]/.test(digits)) return "Amex";
+    if (/^6/.test(digits)) return "Discover";
+    return "Card";
+  }, [cardNumber]);
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-28 pt-12 sm:px-6 lg:grid-cols-[1fr_400px] lg:px-8 lg:pb-12">
       <div>
         <h1 className="text-5xl font-black">Checkout</h1>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {["Address", "Delivery", "Payment"].map((step, index) => (
-            <div key={step} className="rounded-2xl bg-white p-4 dark:bg-white/5">
-              <p className="text-sm font-black text-accent">Step {index + 1}</p>
-              <p className="mt-1 font-black">{step}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 grid gap-6">
+        <div className="mt-6 grid gap-6">
           <div className="rounded-3xl bg-white p-6 dark:bg-white/5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-2xl font-black">Shipping address</h2>
@@ -69,11 +72,29 @@ export default function CheckoutPage() {
             <h2 className="text-2xl font-black">Payment section</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {paymentMethods.map(({ Icon, label }) => (
-                <button key={label} className="focus-ring rounded-2xl border border-black/10 p-4 text-left font-bold transition hover:border-accent dark:border-white/10">
+                <button
+                  key={label}
+                  onClick={() => setPaymentMethod(label)}
+                  className={`focus-ring rounded-2xl border p-4 text-left font-bold transition hover:border-accent dark:border-white/10 ${
+                    paymentMethod === label ? "border-accent bg-violet-50 text-accent dark:bg-white/10" : "border-black/10"
+                  }`}
+                >
                   <Icon className="mb-3 text-accent" /> {label}
                 </button>
               ))}
             </div>
+            {paymentMethod === "Card" ? (
+              <div className="mt-5 grid gap-3 rounded-2xl border border-black/10 p-4 dark:border-white/10 sm:grid-cols-[1fr_auto] sm:items-center">
+                <input
+                  value={cardNumber}
+                  onChange={(event) => setCardNumber(event.target.value)}
+                  inputMode="numeric"
+                  placeholder="Card number"
+                  className="focus-ring min-h-12 rounded-full border border-black/10 bg-transparent px-4 dark:border-white/10"
+                />
+                <span className="rounded-full bg-ink px-4 py-2 text-sm font-black text-white dark:bg-white dark:text-ink">{cardBrand}</span>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

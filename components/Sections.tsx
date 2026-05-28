@@ -212,13 +212,6 @@ export function TrustAndSocial() {
           </div>
         ))}
       </div>
-      <div className="mt-12 grid gap-4 lg:grid-cols-3">
-        {["LUMA", "AETHER", "KIN", "NOVA", "MONO", "ATLAS"].map((brand) => (
-          <div key={brand} className="rounded-2xl border border-black/5 py-5 text-center text-xl font-black tracking-[0.28em] text-neutral-300 dark:border-white/10">
-            {brand}
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

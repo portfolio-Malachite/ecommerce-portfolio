@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Modal } from "@/components/Modal";
@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: Product }) {
           Quick view
         </button>
         <button onClick={() => addItem(product)} className="focus-ring mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-bold text-white transition hover:bg-accent dark:bg-white dark:text-ink dark:hover:bg-accent dark:hover:text-white">
-          <ShoppingBag size={17} /> Add to cart
+          <ShoppingCart size={17} strokeWidth={1.9} /> Add to cart
         </button>
       </div>
     </motion.article>

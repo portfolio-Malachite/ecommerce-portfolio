@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Minus, Plus, Star, Truck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/Button";
@@ -10,11 +11,17 @@ import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/utils";
 
 export function ProductDetails({ product }: { product: Product }) {
+  const router = useRouter();
   const [image, setImage] = useState(product.gallery[0]);
   const [size, setSize] = useState(product.sizes[0]);
   const [color, setColor] = useState(product.colors[0]);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+
+  function buyNow() {
+    addItem(product, { quantity, size, color });
+    router.push("/checkout");
+  }
 
   return (
     <>
@@ -62,13 +69,20 @@ export function ProductDetails({ product }: { product: Product }) {
               ))}
             </div>
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 grid gap-3 sm:grid-cols-[auto_1fr_1fr]">
             <div className="flex h-12 items-center rounded-full bg-white dark:bg-white/5">
               <button className="px-4" onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity"><Minus size={17} /></button>
               <span className="min-w-8 text-center font-black">{quantity}</span>
               <button className="px-4" onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity"><Plus size={17} /></button>
             </div>
-            <Button onClick={() => addItem(product, { quantity, size, color })} className="flex-1 sm:flex-none">Add to cart</Button>
+            <Button onClick={() => addItem(product, { quantity, size, color })}>Add to cart</Button>
+            <Button
+              onClick={buyNow}
+              variant="secondary"
+              className="shadow-lg shadow-black/15 hover:shadow-luxury dark:bg-ink dark:text-white dark:hover:bg-accent"
+            >
+              Buy now
+            </Button>
           </div>
           <div className="mt-8 rounded-3xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/5">
             <p className="flex items-center gap-2 font-black"><Truck className="text-accent" /> Shipping info</p>
